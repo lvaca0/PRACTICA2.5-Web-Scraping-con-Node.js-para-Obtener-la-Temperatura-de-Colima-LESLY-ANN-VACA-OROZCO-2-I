@@ -2,121 +2,69 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta de Temperatura - Colima</title>
+    <title>Clima Colima - Lesly Vaca</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #64b3f4, #c2e59c);
             height: 100vh;
-            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin: 0;
         }
-        
-        .container {
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
+        .card {
+            background: white;
             padding: 30px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             text-align: center;
-            width: 350px;
+            width: 320px;
         }
-        
-        h1 { color: #2d3e50; margin-bottom: 10px; }
-        .info { color: #7f8c8d; margin-bottom: 20px; }
-        
-        .temperatura-display {
-            font-size: 4rem;
-            font-weight: bold;
-            color: #e67e22;
-            margin: 20px 0;
-            min-height: 80px;
-        }
-        
+        h1 { color: #2c3e50; margin: 0; font-size: 1.5rem; }
+        .temp { font-size: 4rem; font-weight: bold; color: #e67e22; margin: 10px 0; }
+        .sensacion { color: #7f8c8d; font-size: 1.1rem; margin-bottom: 20px; }
         button {
-            background-color: #3498db;
+            background: #3498db;
             color: white;
             border: none;
-            padding: 15px;
-            font-size: 1rem;
-            border-radius: 8px;
+            padding: 12px 25px;
+            border-radius: 10px;
             cursor: pointer;
             width: 100%;
-            transition: 0.3s;
+            font-size: 1rem;
         }
-        
-        button:hover { background-color: #2980b9; }
-        button:disabled { background-color: #bdc3c7; }
-        
-        .status { margin-top: 15px; font-size: 0.9rem; color: #34495e; }
-
-        /* Animación de carga */
-        .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #e67e22;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        button:hover { background: #2980b9; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Colima, México</h1>
-        <p class="info">Web Scraping con Node.js</p>
-        
-        <div class="temperatura-display" id="temperatura">--°</div>
-        
-        <button id="btnConsultar">Consultar Temperatura</button>
-        
-        <div class="status" id="status">Listo para consultar</div>
+    <div class="card">
+        <h1>Colima, MX</h1>
+        <div class="temp" id="valor-temp">--°</div>
+        <div class="sensacion" id="valor-sensacion">Sensación: --</div>
+        <button onclick="consultar()">Consultar Clima</button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
-
     <script>
-        const tempDiv = document.getElementById('temperatura');
-        const statusDiv = document.getElementById('status');
-        const boton = document.getElementById('btnConsultar');
-
-        // Esta es la dirección de TU servidor de Node.js
-        const MI_API_URL = "http://localhost:3000/clima";
-
-        async function obtenerTemperatura() {
+        async function consultar() {
+            const tempDiv = document.getElementById('valor-temp');
+            const sensDiv = document.getElementById('valor-sensacion');
+            
             try {
-                // Estado visual de carga
-                tempDiv.innerHTML = '<div class="loader"></div>';
-                statusDiv.textContent = "Conectando con el servidor...";
-                boton.disabled = true;
-
-                // Hacemos la petición a nuestro servidor local [cite: 27]
-                const response = await axios.get(MI_API_URL);
+                tempDiv.textContent = "...";
+                const res = await axios.get('http://localhost:3000/clima');
                 
-                // Si el servidor responde con la temperatura
-                if (response.data && response.data.temp) {
-                    tempDiv.textContent = response.data.temp;
-                    statusDiv.textContent = "Actualizado correctamente";
-                } else {
-                    throw new Error("Dato no encontrado");
-                }
-
-            } catch (error) {
-                console.error("Error:", error);
+                // Actualizamos ambos datos en la pantalla
+                tempDiv.textContent = res.data.temp;
+                sensDiv.innerHTML = `Sensación térmica: <b>${res.data.sensacion}</b>`;
+                
+            } catch (e) {
                 tempDiv.textContent = "❌";
-                statusDiv.textContent = "Asegúrate de que 'server.js' esté corriendo.";
-            } finally {
-                boton.disabled = false;
+                sensDiv.textContent = "Error al conectar";
             }
         }
-
-        // Evento al hacer clic
-        boton.addEventListener('click', obtenerTemperatura);
     </script>
 </body>
 </html>
