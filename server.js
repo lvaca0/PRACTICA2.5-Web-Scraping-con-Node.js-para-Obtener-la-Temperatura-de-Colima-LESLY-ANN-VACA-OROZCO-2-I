@@ -17,15 +17,22 @@ app.get('/clima', async (req, res) => {
         });
 
         const $ = cheerio.load(data);
+        
+        // Extraemos temperatura actual
         const temperatura = $("[data-testid='TemperatureValue']").first().text();
+        
+        // Extraemos sensación térmica (RETO INTEGRADOR)
+        const sensacion = $("[data-testid='FeelsLikeSection'] [data-testid='TemperatureValue']").text();
 
         if (temperatura) {
-            res.json({ temp: temperatura });
+            res.json({ 
+                temp: temperatura,
+                sensacion: sensacion || "No disponible" 
+            });
         } else {
-            res.status(404).json({ error: "No se encontró el dato" });
+            res.status(404).json({ error: "No encontrado" });
         }
     } catch (error) {
-        console.error("Error al obtener datos:", error.message);
         res.status(500).json({ error: "Error de conexión" });
     }
 });
