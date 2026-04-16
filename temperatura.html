@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Temperatura - Colima</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #64b3f4, #c2e59c);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+        }
+        
+        h1 { color: #2d3e50; margin-bottom: 10px; }
+        .info { color: #7f8c8d; margin-bottom: 20px; }
+        
+        .temperatura-display {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #e67e22;
+            margin: 20px 0;
+            min-height: 80px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+        }
+        
+        button:hover { background-color: #2980b9; }
+        button:disabled { background-color: #bdc3c7; }
+        
+        .status { margin-top: 15px; font-size: 0.9rem; color: #34495e; }
+
+        /* Animación de carga */
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #e67e22;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Colima, México</h1>
+        <p class="info">Web Scraping con Node.js</p>
+        
+        <div class="temperatura-display" id="temperatura">--°</div>
+        
+        <button id="btnConsultar">Consultar Temperatura</button>
+        
+        <div class="status" id="status">Listo para consultar</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+
+    <script>
+        const tempDiv = document.getElementById('temperatura');
+        const statusDiv = document.getElementById('status');
+        const boton = document.getElementById('btnConsultar');
+
+        // Esta es la dirección de TU servidor de Node.js
+        const MI_API_URL = "http://localhost:3000/clima";
+
+        async function obtenerTemperatura() {
+            try {
+                // Estado visual de carga
+                tempDiv.innerHTML = '<div class="loader"></div>';
+                statusDiv.textContent = "Conectando con el servidor...";
+                boton.disabled = true;
+
+                // Hacemos la petición a nuestro servidor local [cite: 27]
+                const response = await axios.get(MI_API_URL);
+                
+                // Si el servidor responde con la temperatura
+                if (response.data && response.data.temp) {
+                    tempDiv.textContent = response.data.temp;
+                    statusDiv.textContent = "Actualizado correctamente";
+                } else {
+                    throw new Error("Dato no encontrado");
+                }
+
+            } catch (error) {
+                console.error("Error:", error);
+                tempDiv.textContent = "❌";
+                statusDiv.textContent = "Asegúrate de que 'server.js' esté corriendo.";
+            } finally {
+                boton.disabled = false;
+            }
+        }
+
+        // Evento al hacer clic
+        boton.addEventListener('click', obtenerTemperatura);
+    </script>
+</body>
+</html>
